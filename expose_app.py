@@ -578,97 +578,88 @@ def main():
                         f"{camera.detector_name} ({camera.detector.get('detector_type', 'N/A')})",
                         camera.detector['band'],
                         f"{camera.detector['pixel_size_um']} μm",
-                        f"fl={camera.lens_focal_length_mm} mm, f/{camera.lens_f_number:.2f}",
+                        f"fl={camera.lens_focal_length_mm} mm, f/{camera.lens_f_number:.1f}",
                         f"{camera.fov_H_deg:.2f}° × {camera.fov_V_deg:.2f}°",
-                        f"{camera.ifov_rad*1e6:.2f} μrad",
+                        f"{camera.ifov_rad*1e6:.1f} μrad",
                         f"{camera.filter_cut_on_nm}-{camera.filter_cut_off_nm} nm",
                         f"{camera.distance_AU:.2f} AU",
                         f"{camera.target_albedo_blue:.2f} / {camera.target_albedo_red:.2f}",
                         f"{camera.exposure_time_s*1e3:.3f} ms",
-                        f"{100*camera.full_well_fraction:.1f}%",
-                    f"{camera.Se_total:.0f} e⁻",
-                    f"{camera.SNR:.1f}"
-                ]
-            }
-            
-            df_results = pd.DataFrame(results_data)
-            st.dataframe(df_results, hide_index=True, use_container_width=True)
-            
-            # Warning for saturation
-            if camera.full_well_fraction > 1.0:
-                st.error("⚠️ Warning: Full well capacity exceeded! The detector is saturated.")
-            elif camera.full_well_fraction > 0.8:
-                st.warning("⚠️ Warning: Approaching full well capacity.")
-        
-        with col2:
-            st.subheader("📈 Spectral Analysis")
-            
-            # Create and display interactive plot
-            fig = create_plots(camera)
-            st.plotly_chart(fig, use_container_width=True)
-        
-        # Download results
-        st.subheader("💾 Export Results")
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # CSV download
-            csv_data = pd.DataFrame({
-                'Wavelength_nm': camera.wavelengths_nm,
-                'QE': camera.qe_curve,
-                'Filter_Transmission': camera.filter_transmission,
-                'Lens_Transmission': camera.lens_transmission,
-                'Target_Radiance': camera.target_radiance,
-                'Signal_e_per_nm': camera.Se
-            })
-            csv_string = csv_data.to_csv(index=False)
-            st.download_button(
-                label="Download Spectral Data (CSV)",
-                data=csv_string,
-                file_name=f"camera_analysis_{detector_name}_{band}.csv",
-                mime="text/csv"
-            )
-        
-        with col2:
-            # JSON download
-            results_json = {
-                'detector': camera.detector,
-                'lens': {
-                    'focal_length_mm': camera.lens_focal_length_mm,
-                    'f_number': camera.lens_f_number,
-                    'transmission': float(camera.lens_transmission[0])
-                },
-                'filter': {
-                    'cut_on_nm': camera.filter_cut_on_nm,
-                    'cut_off_nm': camera.filter_cut_off_nm,
-                    'peak_transmission': camera.filter_transmission_peak
-                },
-                'results': {
-                    'SNR': float(camera.SNR),
-                    'signal_total_e': float(camera.Se_total),
-                    'exposure_time_s': float(camera.exposure_time_s),
-                    'full_well_fraction': float(camera.full_well_fraction)
+                        f"{100*camera.full_well_fraction:.1f}%" if camera.full_well_fraction > 0 else "N/A",
+                        f"{camera.Se_total:.0f} e⁻",
+                        f"{camera.SNR:.1f}"
+                    ]
                 }
-            }
-            json_string = json.dumps(results_json, indent=2)
-            st.download_button(
-                label="Download Configuration (JSON)",
-                data=json_string,
-                file_name=f"camera_config_{detector_name}_{band}.json",
-                mime="application/json"
-            )
-    
-    else:
-        st.info("👈 Configure your camera parameters in the sidebar and click 'Calculate SNR' to see results.")
+                
+                df_results = pd.DataFrame(results_data)
+                st.dataframe(df_results, hide_index=True, use_container_width=True)
+                
+                # Warning for saturation
+                if camera.full_well_fraction > 1.0:
+                    st.error("⚠️ Warning: Full well capacity exceeded! The detector is saturated.")
+                elif camera.full_well_fraction > 0.8:
+                    st.warning("⚠️ Warning: Approaching full well capacity.")
+            
+            with col2:
+                st.subheader("📈 Spectral Analysis")
+                
+                # Create and display interactive plot
+                fig = create_plots(camera)
+                st.plotly_chart(fig, use_container_width=True)
+            
+            # Download results
+            st.subheader("💾 Export Results")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # CSV download
+                csv_data = pd.DataFrame({
+                    'Wavelength_nm': camera.wavelengths_nm,
+                    'QE': camera.qe_curve,
+                    'Filter_Transmission': camera.filter_transmission,
+                    'Lens_Transmission': camera.lens_transmission,
+                    'Target_Radiance': camera.target_radiance,
+                    'Signal_e_per_nm': camera.Se
+                })
+                csv_string = csv_data.to_csv(index=False)
+                st.download_button(
+                    label="Download Spectral Data (CSV)",
+                    data=csv_string,
+                    file_name=f"camera_analysis_{detector_name}_{band}.csv",
+                    mime="text/csv"
+                )
+            
+            with col2:
+                # JSON download
+                results_json = {
+                    'detector': camera.detector,
+                    'lens': {
+                        'focal_length_mm': camera.lens_focal_length_mm,
+                        'f_number': camera.lens_f_number,
+                        'transmission': float(camera.lens_transmission[0])
+                    },
+                    'filter': {
+                        'cut_on_nm': camera.filter_cut_on_nm,
+                        'cut_off_nm': camera.filter_cut_off_nm,
+                        'peak_transmission': camera.filter_transmission_peak
+                    },
+                    'results': {
+                        'SNR': float(camera.SNR),
+                        'signal_total_e': float(camera.Se_total),
+                        'exposure_time_s': float(camera.exposure_time_s),
+                        'full_well_fraction': float(camera.full_well_fraction)
+                    }
+                }
+                json_string = json.dumps(results_json, indent=2)
+                st.download_button(
+                    label="Download Configuration (JSON)",
+                    data=json_string,
+                    file_name=f"camera_config_{detector_name}_{band}.json",
+                    mime="application/json"
+                )
         
-        # Show detector specifications table
-        st.subheader("📋 Available Detectors")
-        detector_df = pd.DataFrame.from_dict(DETECTORS_DATA, orient='index')
-        detector_df = detector_df[['detector_type', 'manufacturer', 'pixel_count_H', 'pixel_count_V', 
-                                 'pixel_size_um', 'read_noise_e', 'full_well_capacity_e']]
-        detector_df.columns = ['Type', 'Manufacturer', 'H Pixels', 'V Pixels', 'Pixel Size (μm)', 
-                              'Read Noise (e⁻)', 'Full Well (e⁻)']
-        st.dataframe(detector_df, use_container_width=True)
+        else:
+            st.info("Calculating SNR...")
 
 if __name__ == "__main__":
     main()
