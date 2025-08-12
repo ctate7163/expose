@@ -291,6 +291,7 @@ def main():
         )
         
         st.sidebar.markdown("**Lens**")
+        
         focal_length = st.sidebar.number_input(
             "Focal Length (mm)", 0.0, 10000.0,
             value=st.session_state.get('focal_length', 100.0), 
@@ -299,17 +300,19 @@ def main():
         )
         f_number = st.sidebar.number_input(
             "F-number", 1.0, 20.0,
-            value=st.session_state.get('f_number', 3.0), 
+            value=st.session_state.get('f_number', 3.6), 
             key='f_number',
             step=0.1
         )
-        lens_transmission = st.sidebar.slider(
-            "Transmission", 0.1, 1.0, 
-            st.session_state.get('lens_transmission', 0.9), 0.05,
-            key='lens_transmission'
+        lens_transmission = st.sidebar.number_input(
+            "Transmission", 0.01, 1.0, 
+            st.session_state.get('lens_transmission', 0.9),
+            key='lens_transmission',
+            step=0.01
         )
         
         st.sidebar.markdown("**Filter**")
+
         cut_on_nm = st.sidebar.number_input(
             "Cut-on (nm)", 
             value=st.session_state.get('cut_on_nm', 400), 
@@ -324,33 +327,39 @@ def main():
             key='cut_off_nm',
             step=10
         )
-        filter_transmission = st.sidebar.slider(
+        filter_transmission = st.sidebar.number_input(
             "Peak Transmission", 0.1, 1.0, 
-            st.session_state.get('filter_transmission', 0.95), 0.05,
-            key='filter_transmission'
+            st.session_state.get('filter_transmission', 0.98),
+            key='filter_transmission',
+            step=0.01
         )
         
         st.sidebar.markdown("**Target**")
+
         distance_AU = st.sidebar.number_input(
             "Distance (AU)", 
             value=st.session_state.get('distance_AU', 1.66), 
             min_value=0.1, max_value=10.0,
-            key='distance_AU'
+            key='distance_AU',
+            step=.1
         )
-        albedo_blue = st.sidebar.slider(
+        albedo_blue = st.sidebar.number_input(
             "Albedo (Blue)", 0.0, 1.0, 
-            st.session_state.get('albedo_blue', 0.2), 0.01,
-            key='albedo_blue'
+            st.session_state.get('albedo_blue', 0.1),
+            key='albedo_blue',
+            step=.02
         )
-        albedo_red = st.sidebar.slider(
+        albedo_red = st.sidebar.number_input(
             "Albedo (Red-NIR)", 0.0, 1.0, 
-            st.session_state.get('albedo_red', 0.2), 0.01,
-            key='albedo_red'
+            st.session_state.get('albedo_red', 0.1),
+            key='albedo_red',
+            step=.02
         )
-        incidence_angle = st.sidebar.slider(
+        incidence_angle = st.sidebar.number_input(
             "Incidence Angle (°)", 0.0, 90.0, 
-            st.session_state.get('incidence_angle', 30.0), 1.0,
-            key='incidence_angle'
+            st.session_state.get('incidence_angle', 30.0),
+            key='incidence_angle',
+            step=1.0
         )
         
         enable_atm_correction = st.sidebar.checkbox(
@@ -359,15 +368,17 @@ def main():
             key='enable_atm_correction'
         )
         if enable_atm_correction:
-            optical_depth = st.sidebar.slider(
+            optical_depth = st.sidebar.number_input(
                 "Optical Depth", 0.0, 2.0, 
                 st.session_state.get('optical_depth', 0.1), 0.01,
-                key='optical_depth'
+                key='optical_depth',
+                step=0.01
             )
         else:
             st.session_state.optical_depth = 0.0
         
         st.sidebar.markdown("**Exposure**")
+        
         exposure_mode = st.sidebar.radio(
             "Calculate:",
             options=["SNR for given exposure", "Exposure for given SNR"],
@@ -377,9 +388,10 @@ def main():
         if exposure_mode == "SNR for given exposure":
             exposure_time_ms = st.sidebar.number_input(
                 "Exposure Time (ms)", 
-                value=st.session_state.get('exposure_time_ms', 1.0), 
+                value=st.session_state.get('exposure_time_ms', 0.5), 
                 min_value=0.0001, max_value=10000.0,
-                key='exposure_time_ms'
+                key='exposure_time_ms',
+                step=0.1
             )
             calculate_exposure = False
             target_snr = 100  # Not used in this mode

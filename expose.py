@@ -236,13 +236,13 @@ def create_plots(camera):
     fig.add_trace(go.Scatter(x=x, y=camera.filter_transmission, name='Filter',
                             line=dict(color='#A23B72'), legendgroup='group1', showlegend=True), row=1, col=1)
     fig.add_trace(go.Scatter(x=x, y=camera.qe_curve, name='QE',
-                            line=dict(color='#F18F01'), legendgroup='group1', showlegend=True), row=1, col=1)
+                            line=dict(color='#7209B7'), legendgroup='group1', showlegend=True), row=1, col=1)
     fig.add_trace(go.Scatter(x=x, y=camera.target_albedo, name='Albedo',
                             line=dict(color='#C73E1D'), legendgroup='group1', showlegend=True), row=1, col=1)
     
     # Plot 2: Spectral irradiance
     fig.add_trace(go.Scatter(x=x, y=camera.target_irradiance, name='Irradiance',
-                            line=dict(color='#7209B7'), legendgroup='group2', showlegend=True), row=2, col=1)
+                            line=dict(color='#F18F01'), legendgroup='group2', showlegend=True), row=2, col=1)
     fig.add_trace(go.Scatter(x=x, y=camera.target_exitance, name='Exitance',
                             line=dict(color='#2F9599'), legendgroup='group2', showlegend=True), row=2, col=1)
     
