@@ -38,6 +38,19 @@
     "qe_curve_csv": "qe_KAF-1001",
     "dark_current_e_per_s": 0.0
   },
+    "MOC": {
+    "detector_name": "MOC",
+    "detector_type": "CCD",
+    "manufacturer": "-",
+    "pixel_count_H": 2048,
+    "pixel_count_V": 1,
+    "pixel_size_um": 13.0,
+    "read_noise_e": 10,
+    "full_well_capacity_e": 10000.0,
+    "optical_fill_factor": 1.0,
+    "qe_curve_csv": "qe_PYTHON-5000",
+    "dark_current_e_per_s": 0.0
+  },
   "CIS-120": {
     "detector_name": "CIS-120",
     "detector_type": "CCD",
