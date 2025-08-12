@@ -123,6 +123,7 @@ class Camera:
 
         self.distance_AU = distance_AU
         self.target_name = target_name
+        self.incidence_angle_deg = incidence_angle_deg
 
         self.target_irradiance = (1/distance_AU)**2 * solar_radiance_1AU * np.cos(np.radians(incidence_angle_deg))
         self.target_exitance = self.target_irradiance * self.target_albedo
@@ -173,7 +174,7 @@ class Camera:
         self.SNR = signal / noise if noise > 0 else 0
         return self.SNR
 
-    def calculate_exposure_for_snr(self, target_snr, npixels=1, max_exposure_s=10.0):
+    def calculate_exposure_for_snr(self, target_snr ):
         """Calculate exposure time needed to achieve target SNR"""
         self.calculate_electron_rate()
         
@@ -185,39 +186,31 @@ class Camera:
         dark_rate = self.detector['dark_current_e_per_s'] if self.detector['dark_current_e_per_s'] > 0 else 0
         RN = self.detector['read_noise_e'] if self.detector['read_noise_e'] > 0 else 0
         
-        # Solve quadratic equation for exposure time
+        # Solve quadratic equation for exposure time npixels=1
         # target_snr^2 = (Se_rate * t * npixels)^2 / (Se_rate * t * npixels + dark_rate * t * npixels + RN^2 * npixels)
         
-        a = Se_rate_total**2 * npixels**2 - target_snr**2 * Se_rate_total * npixels
-        b = -target_snr**2 * dark_rate * npixels
-        c = -target_snr**2 * RN**2 * npixels
+        a = Se_rate_total**2 
+        b = -target_snr**2 * (Se_rate_total + dark_rate)
+        c = -target_snr**2 * RN**2 
         
-        if a != 0:
+        try:
             discriminant = b**2 - 4*a*c
-            if discriminant >= 0:
-                exposure_time = (-b + np.sqrt(discriminant)) / (2*a)
-                if exposure_time > 0 and exposure_time <= max_exposure_s:
-                    self.exposure_time_s = exposure_time
-                    self.Se = self.Se_rate * exposure_time
-                    self.Se_total = np.sum(self.Se)
-                    
-                    if self.detector['full_well_capacity_e'] > 0:
-                        self.full_well_fraction = self.Se_total / self.detector['full_well_capacity_e']
-                    else:
-                        self.full_well_fraction = 0
-                    
-                    self.SNR = target_snr
-                    return exposure_time
+            exposure_time = (-b + np.sqrt(discriminant)) / (2*a)
+        except ValueError:
+            st.error(f"❌ Unable to calculate exposure time for target SNR {target_snr}. Please check the parameters.")
+            return None
         
-        # Fallback to iterative method if quadratic fails
-        for exp_time in np.logspace(-6, np.log10(max_exposure_s), 1000):
-            snr = self.calculate_snr(exp_time, npixels)
-            if snr >= target_snr:
-                return exp_time
-        
-        return max_exposure_s  # Return max if target cannot be achieved
+        self.SNR = target_snr
+        self.exposure_time_s = exposure_time
+        self.Se = self.Se_rate * self.exposure_time_s
+        self.Se_total = np.sum(self.Se)
 
+        if self.detector['full_well_capacity_e'] > 0:
+            self.full_well_fraction = self.Se_total / self.detector['full_well_capacity_e']
+        else:
+            self.full_well_fraction = 0
 
+        return exposure_time
 
 def create_plots(camera):
     """Create interactive plots using Plotly with legends """

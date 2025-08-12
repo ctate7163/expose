@@ -122,13 +122,14 @@ def load_preset_config(config_name, configs):
         st.session_state.incidence_angle = target.get('incidence_angle_deg', 30.0)
         st.session_state.optical_depth = target.get('optical_depth', 0.0)
         st.session_state.enable_atm_correction = st.session_state.optical_depth > 0
+        st.session_state.target_name = target.get('target_name', '')
         
         exposure = config.get('exposure', {})
         st.session_state.exposure_time_ms = exposure.get('exposure_time_ms', 1.0)
         
         st.session_state.force_calculation = True
 
-def calculate_camera_snr(calculate_exposure=False, target_snr=100):
+def calculate_camera_snr(calculate_exposure=False, target_snr=50.0):
     """Calculate camera SNR or exposure time"""
     try:
         detector_name = st.session_state.get('detector_name', 'PYTHON-5000')
@@ -194,7 +195,7 @@ def format_configuration_json(camera, config_name="Custom Configuration"):
                 "albedo": [camera.target_albedo_blue, camera.target_albedo_red],
                 "incidence_angle_deg": getattr(camera, 'atmospheric_correction_incidence_angle_deg', 30.0),
                 "optical_depth": getattr(camera, 'atmospheric_correction_optical_depth', 0.0),
-                "target_name": getattr(camera, 'target_name', '')
+                "target_name": camera.target_name,
             },
             "exposure": {
                 "exposure_time_ms": camera.exposure_time_s * 1000
@@ -285,8 +286,8 @@ def main():
         
         band = st.sidebar.selectbox(
             "Band",
-            options=["MONO", "RED", "GREEN", "BLUE"],
-            index=["MONO", "RED", "GREEN", "BLUE"].index(st.session_state.get('band', 'MONO')),
+            options=["MONO", "RED", "GREEN", "BLUE", "NIR"],
+            index=["MONO", "RED", "GREEN", "BLUE", "NIR"].index(st.session_state.get('band', 'MONO')),
             key='band'
         )
         
@@ -347,13 +348,13 @@ def main():
             "Albedo (Blue)", 0.0, 1.0, 
             st.session_state.get('albedo_blue', 0.1),
             key='albedo_blue',
-            step=.02
+            step=.01
         )
         albedo_red = st.sidebar.number_input(
             "Albedo (Red-NIR)", 0.0, 1.0, 
             st.session_state.get('albedo_red', 0.1),
             key='albedo_red',
-            step=.02
+            step=.01
         )
         incidence_angle = st.sidebar.number_input(
             "Incidence Angle (°)", 0.0, 90.0, 
@@ -369,15 +370,32 @@ def main():
         )
         if enable_atm_correction:
             optical_depth = st.sidebar.number_input(
-                "Optical Depth", 0.0, 2.0, 
+                "Delta Optical Depth", 0.0, 2.0, 
                 st.session_state.get('optical_depth', 0.1),
                 key='optical_depth',
                 step=0.01
             )
         else:
             st.session_state.optical_depth = 0.0
+
+        st.sidebar.markdown("**Pixel Summing**")
+        st.sidebar.markdown("(comming soon)")
+
+        # npixels_ana = st.sidebar.number_input(
+        #     "Analogue pixel sum", 1, 16, 
+        #     st.session_state.get('npixels_ana', 1),
+        #     key='npixels_ana',
+        #     step=1
+        # )
+
+        # npixels_dig = st.sidebar.number_input(
+        #     "Digital pixel sum", 1, 16, 
+        #     st.session_state.get('npixels_dig', 1),
+        #     key='npixels_dig',
+        #     step=1
+        # )
         
-        st.sidebar.markdown("**Exposure**")
+        st.sidebar.markdown("**Signal and Noise**")
 
         exposure_mode = st.sidebar.radio(
             "Calculate:",
@@ -398,9 +416,10 @@ def main():
         else:
             target_snr = st.sidebar.number_input(
                 "Target SNR", 
-                value=st.session_state.get('target_snr', 100.0), 
+                value=st.session_state.get('target_snr', 50.0), 
                 min_value=0.1, max_value=1000.0,
-                key='target_snr'
+                key='target_snr',
+                step=1.0
             )
             calculate_exposure = True
             exposure_time_ms = 1.0  # Will be calculated
@@ -409,7 +428,7 @@ def main():
         if ('results_calculated' not in st.session_state or 
             st.session_state.get('force_calculation', False)):
             st.session_state.force_calculation = True
-            calculate_camera_snr(calculate_exposure, target_snr if calculate_exposure else 100)
+            calculate_camera_snr(calculate_exposure, target_snr if calculate_exposure else 50)
         
         # Display results
         if st.session_state.get('results_calculated', False):
@@ -421,9 +440,9 @@ def main():
                 st.subheader("Results Summary")
                 
                 # Build target description
-                target_desc = f"d={camera.distance_AU:.2f} AU, a=[{camera.target_albedo_blue:.2f},{camera.target_albedo_red:.2f}]"
+                target_desc = f"A_blue= {camera.target_albedo_blue:.2f}, A_red= {camera.target_albedo_red:.2f}"
                 if hasattr(camera, 'target_name') and camera.target_name:
-                    target_desc = f"{camera.target_name} at {target_desc}"
+                    target_desc = f"{camera.target_name}: {target_desc}"
                 
                 results_data = {
                     'Parameter': [
@@ -433,19 +452,23 @@ def main():
                         'FOV',
                         'Filter',
                         'Target',
+                        'Illumination',
+                        # 'Pixel Summing',
                         'Exposure Time',
                         'Signal',
                         'SNR'
                     ],
                     'Values': [
-                        f"{camera.detector_name} {camera.detector['band']}, pitch={camera.detector['pixel_size_um']} μm",
-                        f"fl={camera.lens_focal_length_mm:.1f} mm, f/{camera.lens_f_number:.1f}, ap={camera.lens_aperture_mm:.1f} mm, T={camera.lens_mean_transmission:.2f}",
-                        f"IFOV= {camera.ifov_rad*1e6:.1f} μrad, Diff= {camera.diffraction_limit_rad*1e6:.1f} μrad",
+                        f"{camera.detector_name} {camera.detector['band']}, pitch = {camera.detector['pixel_size_um']} μm",
+                        f"fl = {camera.lens_focal_length_mm:.1f} mm, f/{camera.lens_f_number:.1f}, ap = {camera.lens_aperture_mm:.1f} mm, T = {camera.lens_mean_transmission:.2f}",
+                        f"ifov = {camera.ifov_rad*1e6:.1f} μrad, Diff = {camera.diffraction_limit_rad*1e6:.1f} μrad",
                         f"{camera.fov_H_deg:.2f}° × {camera.fov_V_deg:.2f}°",
-                        f"{camera.filter_cut_on_nm}-{camera.filter_cut_off_nm} nm, T={camera.filter_transmission_peak:.2f}",
+                        f"{camera.filter_cut_on_nm} — {camera.filter_cut_off_nm} nm, T = {camera.filter_transmission_peak:.2f}",
                         target_desc,
+                        f"Solar: d = {camera.distance_AU:.2f} AU, i = {camera.incidence_angle_deg:.2f}°" ,
+                        # f"{camera.exposure_time_s}",
                         f"{camera.exposure_time_s*1e3:.3f} ms" + (f" (calculated)" if calculate_exposure else ""),
-                        f"{camera.Se_total:.0f} e⁻, FW= {100*camera.full_well_fraction:.1f}%",
+                        f"{camera.Se_total:.0f} e⁻, FW = {100*camera.full_well_fraction:.1f}%",
                         f"{camera.SNR:.1f}"
                     ]
                 }
@@ -468,7 +491,8 @@ def main():
                     if st.session_state.calculated_exposure_ms > 1000:
                         st.warning(f"⚠️ Long exposure required: {st.session_state.calculated_exposure_ms/1000:.1f}s")
             
-            with col2:
+            # with col2:
+            if 1:
                 st.subheader("Spectral Analysis")
                 fig = create_plots(camera)
                 st.plotly_chart(fig, use_container_width=True)

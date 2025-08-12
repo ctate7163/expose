@@ -12,7 +12,7 @@
     "filter": {
       "cut_on_nm": 475,
       "cut_off_nm": 725,
-      "peak_transmission": 0.98
+      "peak_transmission": 1.0
     },
     "target": {
       "distance_AU": 1.57,
@@ -38,7 +38,7 @@
     "filter": {
       "cut_on_nm": 475,
       "cut_off_nm": 725,
-      "peak_transmission": 0.98
+      "peak_transmission": 1.0
     },
     "target": {
       "distance_AU": 1.66,
@@ -78,6 +78,32 @@
     },
     "exposure": {
       "exposure_time_ms": 0.440
+    }
+  },
+  "CODEX NAC": {
+    "name": "CODEX NAC",
+    "description": "LRO NAC with CIS2521 detector",
+    "detector_name": "CIS2521",
+    "band": "MONO",
+    "lens": {
+      "focal_length_mm": 700,
+      "f_number": 3.6,
+      "mean_transmission": 0.82
+    },
+    "filter": {
+      "cut_on_nm": 400,
+      "cut_off_nm": 800,
+      "peak_transmission": 0.98
+    },
+    "target": {
+      "distance_AU": 2.77,
+      "albedo": 0.03,
+      "incidence_angle_deg": 30.0,
+      "optical_depth": 0.0,
+      "target_name": "Ceres"
+    },
+    "exposure": {
+      "exposure_time_ms": 0.56
     }
   }
 }
