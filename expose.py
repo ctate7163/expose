@@ -227,7 +227,7 @@ def create_plots(camera):
     fig = make_subplots(
         rows=3, cols=1,
         subplot_titles=('Spectral Properties', 'Spectral Irradiance', 'Detector Signal'),
-        vertical_spacing=0.12
+        vertical_spacing=0.1
     )
     
     # Plot 1: Spectral properties
