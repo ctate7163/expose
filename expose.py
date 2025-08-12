@@ -84,10 +84,10 @@ class Camera:
                                        (2 * self.lens_focal_length_mm * 1e-3)) * 180 / np.pi
         self.ifov_rad = (self.detector['pixel_size_um'] / 1e6) / (self.lens_focal_length_mm * 1e-3)
         
-        # Diffraction limited resolution (1.22 * lambda / D) for 550nm
+        # Diffraction limited resolution (2*1.22 * lambda / D) for 550nm
         wavelength_m = 550e-9  # 550 nm in meters
         aperture_diameter_m = self.lens_aperture_mm * 1e-3
-        self.diffraction_limit_rad = 1.22 * wavelength_m / aperture_diameter_m
+        self.diffraction_limit_rad = 2*1.22 * wavelength_m / aperture_diameter_m
 
     def set_filter(self, cut_on_nm=400, cut_off_nm=1000, peak_transmission=0.95):
         self.filter_cut_on_nm = cut_on_nm
