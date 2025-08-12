@@ -64,19 +64,6 @@
     "qe_curve_csv": "qe_CIS-120_M2",
     "dark_current_e_per_s": 0.0
   },
-  "UL04322-039": {
-    "detector_name": "UL04322-039",
-    "detector_type": "MicroBolometer",
-    "manufacturer": "ULIS",
-    "pixel_count_H": 640,
-    "pixel_count_V": 480,
-    "pixel_size_um": 17.0,
-    "read_noise_e": -1,
-    "full_well_capacity_e": -1,
-    "optical_fill_factor": 0.309,
-    "qe_curve_csv": "re_UL04322-039",
-    "dark_current_e_per_s": -1
-  },
   "CIS2521": {
     "detector_name": "CIS2521",
     "detector_type": "CMOS",
