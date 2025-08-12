@@ -27,7 +27,7 @@
   },
     "HDCAM Test": {
     "name": "HDCAM",
-    "description": "HDCAM test",
+    "description": "HDCAM development",
     "detector_name": "PYTHON-5000",
     "band": "MONO",
     "lens": {
