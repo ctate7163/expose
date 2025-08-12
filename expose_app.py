@@ -370,7 +370,7 @@ def main():
         if enable_atm_correction:
             optical_depth = st.sidebar.number_input(
                 "Optical Depth", 0.0, 2.0, 
-                st.session_state.get('optical_depth', 0.1), 0.01,
+                st.session_state.get('optical_depth', 0.1),
                 key='optical_depth',
                 step=0.01
             )
@@ -378,7 +378,7 @@ def main():
             st.session_state.optical_depth = 0.0
         
         st.sidebar.markdown("**Exposure**")
-        
+
         exposure_mode = st.sidebar.radio(
             "Calculate:",
             options=["SNR for given exposure", "Exposure for given SNR"],
