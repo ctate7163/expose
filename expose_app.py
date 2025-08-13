@@ -147,6 +147,7 @@ def calculate_camera_snr(calculate_exposure=False, target_snr=50.0):
         optical_depth = st.session_state.get('optical_depth', 0.0)
         exposure_time_ms = st.session_state.get('exposure_time_ms', 1.0)
         target_name = st.session_state.get('target_name', 'Target')
+        target_name = st.session_state.get('target_name', 'Target')
         
         camera = Camera(detector_name, band=band)
         camera.set_lens(focal_length, f_number, lens_transmission)
