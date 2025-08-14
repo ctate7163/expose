@@ -111,6 +111,12 @@ class Camera:
             albedo_ = [v_, v_, r_, r_]
             albedo = np.interp(l, l_, albedo_)
             return albedo
+        
+        def albedoSpectrum(v_, r_, l=self.wavelengths_nm):
+            l_ = [300, 400, 1100]
+            albedo_ = [v_, v_, r_]
+            albedo = np.interp(l, l_, albedo_)
+            return albedo
 
         if isinstance(albedo, list):
             self.target_albedo_blue = albedo[0]

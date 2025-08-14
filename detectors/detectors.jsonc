@@ -19,7 +19,7 @@
     "pixel_count_H": 1600,
     "pixel_count_V": 1200,
     "pixel_size_um": 7.4,
-    "read_noise_e": 16,
+    "read_noise_e": 20,
     "full_well_capacity_e": 40000.0,
     "optical_fill_factor": 1.0,
     "qe_curve_csv": "qe_KAI-2020",

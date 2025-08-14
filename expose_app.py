@@ -460,11 +460,11 @@ def main():
                         'SNR'
                     ],
                     'Values': [
-                        f"{camera.detector_name} {camera.detector['band']}, pitch = {camera.detector['pixel_size_um']} μm",
+                        f"{camera.detector_name} {camera.detector['band']}, pitch = {camera.detector['pixel_size_um']:.1f} μm,{camera.detector['pixel_count_H']} × {camera.detector['pixel_count_V']}",
                         f"fl = {camera.lens_focal_length_mm:.1f} mm, f/{camera.lens_f_number:.1f}, ap = {camera.lens_aperture_mm:.1f} mm, T = {camera.lens_mean_transmission:.2f}",
                         f"ifov = {camera.ifov_rad*1e6:.1f} μrad, Diff = {camera.diffraction_limit_rad*1e6:.1f} μrad",
                         f"{camera.fov_H_deg:.2f}° × {camera.fov_V_deg:.2f}°",
-                        f"{camera.filter_cut_on_nm} — {camera.filter_cut_off_nm} nm, T = {camera.filter_transmission_peak:.2f}",
+                        f"bandpass: {camera.filter_cut_on_nm} — {camera.filter_cut_off_nm} nm, T = {camera.filter_transmission_peak:.2f}",
                         target_desc,
                         f"Solar: d = {camera.distance_AU:.2f} AU, i = {camera.incidence_angle_deg:.2f}°" ,
                         # f"{camera.exposure_time_s}",
