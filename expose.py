@@ -140,7 +140,9 @@ class Camera:
             self.atmospheric_correction_optical_depth = 0.0
             self.atmospheric_correction_factor = 1.0
         else:
+            self.atmospheric_correction_optical_depth = optical_depth
             self.atmospheric_correction(incidence_angle_deg, optical_depth)
+
 
     def atmospheric_correction(self, incidence_angle_deg=0.0, optical_depth=0.0):
         self.atmospheric_correction_optical_depth = optical_depth
