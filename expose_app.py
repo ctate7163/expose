@@ -441,13 +441,15 @@ def main():
                 st.subheader("Results Summary")
                 
                 # Build target description
-                target_desc = f"A_blue= {camera.target_albedo_blue:.2f}, A_red= {camera.target_albedo_red:.2f}"
+                target_desc = f"A_blue= {camera.target_albedo_blue:.3f}, A_red= {camera.target_albedo_red:.3f}"
                 if hasattr(camera, 'target_name') and camera.target_name:
                     target_desc = f"{camera.target_name}: {target_desc}"
+
                 
                 results_data = {
                     'Parameter': [
                         'Detector',
+                        'Detector cover',
                         'Lens',
                         'Resolution',
                         'FOV',
@@ -460,17 +462,17 @@ def main():
                         'SNR'
                     ],
                     'Values': [
-                        f"{camera.detector_name} {camera.detector['band']}, pitch = {camera.detector['pixel_size_um']:.1f} μm,{camera.detector['pixel_count_H']} × {camera.detector['pixel_count_V']}",
+                        f"{camera.detector_name}, pitch = {camera.detector['pixel_size_um']:.1f} μm, {camera.detector['pixel_count_H']} × {camera.detector['pixel_count_V']} pixels",
+                        f"{camera.detector['band']}",
                         f"fl = {camera.lens_focal_length_mm:.1f} mm, f/{camera.lens_f_number:.1f}, ap = {camera.lens_aperture_mm:.1f} mm, T = {camera.lens_mean_transmission:.2f}",
                         f"ifov = {camera.ifov_rad*1e6:.1f} μrad, Diff = {camera.diffraction_limit_rad*1e6:.1f} μrad",
                         f"{camera.fov_H_deg:.2f}° × {camera.fov_V_deg:.2f}°",
                         f"bandpass: {camera.filter_cut_on_nm} — {camera.filter_cut_off_nm} nm, T = {camera.filter_transmission_peak:.2f}",
                         target_desc,
-                        f"Solar: d = {camera.distance_AU:.2f} AU, i = {camera.incidence_angle_deg:.2f}°" ,
-                        # f"{camera.exposure_time_s}",
-                        f"{camera.exposure_time_s*1e3:.3f} ms" + (f" (calculated)" if calculate_exposure else ""),
+                        f"Solar: d = {camera.distance_AU:.2f} AU, i = {camera.incidence_angle_deg:.2f}°" + (f", ω = {camera.atmospheric_correction_optical_depth:.2f}, corr = {camera.atmospheric_correction_factor:.2f}" if enable_atm_correction else "" ),
+                        f"{camera.exposure_time_s*1e3:.3f} ms" + (f" (estimated)" if calculate_exposure else ""),
                         f"{camera.Se_total:.0f} e⁻, FW = {100*camera.full_well_fraction:.1f}%",
-                        f"{camera.SNR:.1f}"
+                        f"{camera.SNR:.1f}" + (f" (estimated)" if not calculate_exposure else "")
                     ]
                 }
                 
@@ -479,7 +481,7 @@ def main():
                     df_results, 
                     hide_index=True, 
                     use_container_width=True,
-                    height=len(results_data['Parameter']) * 40 + 50  # Dynamic height
+                    height=len(results_data['Parameter']) * 40 + 0  # Dynamic height
                 )
                 
                 # Warnings
@@ -551,7 +553,7 @@ def main():
         
         else:
             st.info("Calculating...")
-            
+
 
 if __name__ == "__main__":
     main()

@@ -112,11 +112,11 @@ class Camera:
             albedo = np.interp(l, l_, albedo_)
             return albedo
         
-        def albedoSpectrum(v_, r_, l=self.wavelengths_nm):
-            l_ = [300, 400, 1100]
-            albedo_ = [v_, v_, r_]
-            albedo = np.interp(l, l_, albedo_)
-            return albedo 
+        # def albedoSpectrum(v_, r_, l=self.wavelengths_nm):
+        #     l_ = [300, 400, 1100]
+        #     albedo_ = [v_, v_, r_]
+        #     albedo = np.interp(l, l_, albedo_)
+        #     return albedo 
         
 
         if isinstance(albedo, list):
@@ -137,6 +137,7 @@ class Camera:
         self.target_radiance = self.target_exitance / np.pi
 
         if optical_depth == 0:
+            self.atmospheric_correction_optical_depth = 0.0
             self.atmospheric_correction_factor = 1.0
         else:
             self.atmospheric_correction(incidence_angle_deg, optical_depth)

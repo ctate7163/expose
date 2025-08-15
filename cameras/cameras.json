@@ -10,8 +10,8 @@
       "mean_transmission": 0.82
     },
     "filter": {
-      "cut_on_nm": 475,
-      "cut_off_nm": 725,
+      "cut_on_nm": 470,
+      "cut_off_nm": 730,
       "peak_transmission": 0.98
     },
     "target": {
@@ -36,8 +36,8 @@
       "mean_transmission": 0.85
     },
     "filter": {
-      "cut_on_nm": 475,
-      "cut_off_nm": 725,
+      "cut_on_nm": 470,
+      "cut_off_nm": 730,
       "peak_transmission": 0.98
     },
     "target": {
