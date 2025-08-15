@@ -116,7 +116,8 @@ class Camera:
             l_ = [300, 400, 1100]
             albedo_ = [v_, v_, r_]
             albedo = np.interp(l, l_, albedo_)
-            return albedo
+            return albedo 
+        
 
         if isinstance(albedo, list):
             self.target_albedo_blue = albedo[0]

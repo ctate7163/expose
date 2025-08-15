@@ -551,6 +551,7 @@ def main():
         
         else:
             st.info("Calculating...")
+            
 
 if __name__ == "__main__":
     main()
